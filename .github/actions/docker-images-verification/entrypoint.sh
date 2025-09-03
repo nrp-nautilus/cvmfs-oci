@@ -1,2 +1,2 @@
 #!/bin/sh -l
-python3 oci-cvmfs.py . https://raw.githubusercontent.com/nrp-nautilus/cvmfs-oci/refs/$GITHUB_REF/main/images.txt --verify
+python3 oci-cvmfs.py . https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$GITHUB_REF/images.txt --verify
