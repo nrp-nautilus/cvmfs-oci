@@ -1,6 +1,6 @@
 name: Docker images verification
 # This workflow is triggered on pushes and pull requests to the repository.
-on: [push, pull_request]
+on: [push, pull_request_target]
 
 
 jobs:
