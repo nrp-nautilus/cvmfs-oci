@@ -1,1 +1,2 @@
 gitlab-registry.nrp-nautilus.io/dweitzel/comfyui-on-nrp:latest
+gitlab-registry.nrp-nautilus.io/hzhu16/fake-demo:latest
