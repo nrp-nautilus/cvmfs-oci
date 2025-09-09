@@ -355,6 +355,47 @@ class ImageUnpacker:
             self.logger.error("Unexpected error processing image {}: {}".format(image_name, e))
             raise ImageUnpackerError("Unexpected error: {}".format(e))
     
+    def remove_unlisted_images(self, current_images, singularity_base, test=False):
+        """
+        Remove the images that are not in the current list
+        """
+        # Get all the image paths
+        named_image_dirs = set()
+        for subdir, dirs, files in os.walk(singularity_base):
+            try:
+                images_index = dirs.index(".images")
+                del dirs[images_index]
+            except ValueError as ve:
+                pass
+            for directory in dirs:
+                path = os.path.join(subdir, directory)
+                if os.path.islink(path):
+                    named_image_dirs.add(path)
+
+        # Compare the list of current images with the list of images from the FS
+        for image in current_images:
+            # Always has the registry as the first entry, remove it
+            image_dir = image.split('/', 1)[-1]
+            full_image_dir = os.path.join(singularity_base, image_dir)
+            if full_image_dir in named_image_dirs:
+                named_image_dirs.remove(full_image_dir)
+
+        # named_image_dirs should now only contain containers that are
+        # not in the images
+        if len(named_image_dirs) > 0:
+            self.start_txn(singularity_base)
+            for image_dir in named_image_dirs:
+                target_path = os.path.realpath(image_dir)
+                #print("The target path of image is  %s" % target_path)
+                print("Removing deleted image: %s" % image_dir)
+                if not test:
+                    try:
+                        os.unlink(image_dir)
+                        shutil.rmtree(target_path)
+                    except OSError as e:
+                        print("Failed to remove deleted image: %s" % e)
+            self.publish_txn(singularity_base)
+
     def start_txn(self, hash_dir):
         global _in_txn
         if str(hash_dir).startswith("/cvmfs/"):
@@ -373,15 +414,6 @@ class ImageUnpacker:
                 self.logger.error ("Transaction start failed (exit status : " + str(result) + "); will not attempt update.")
                 return 1
         _in_txn = True
-
-        # Test CVMFS mount if applicable.
-        #test_dir = os.path.join(singularity_rootfs, "library")
-        #if not os.path.exists(test_dir):
-        #    try:
-        #        os.makedirs(test_dir)
-        #    except OSError as oe:
-        #        if oe.errno != errno.EEXIST:
-        #            raise
 
     def publish_txn (self, hash_dir):
         global _in_txn
@@ -422,7 +454,10 @@ class ImageUnpacker:
                 except Exception as e:
                     errors.append((image_name, str(e)))
                     continue
-            
+
+            # Remove images that are not in the list
+            self.remove_unlisted_images(self.images, self.image_dir)
+
             # Report results
             if errors:
                 self.logger.error("Completed with {} errors:".format(len(errors)))
@@ -530,3 +565,4 @@ Example usage:
 
 if __name__ == '__main__':
     sys.exit(main())
+
