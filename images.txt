@@ -2,3 +2,6 @@ gitlab-registry.nrp-nautilus.io/dweitzel/comfyui-on-nrp:latest
 
 # Derek's testing
 ghcr.io/djw8605/nrp-cvmfs-conda:latest
+
+# NRP test #1
+gitlab-registry.nrp-nautilus.io/nrp/amd-fpga-cvmfs/data-container:latest
