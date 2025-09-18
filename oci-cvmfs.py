@@ -374,27 +374,25 @@ class ImageUnpacker:
 
         # Compare the list of current images with the list of images from the FS
         for image in current_images:
-            # Always has the registry as the first entry, remove it
-            image_dir = image.split('/', 1)[-1]
-            full_image_dir = os.path.join(singularity_base, image_dir)
+            full_image_dir = os.path.join(singularity_base, image)
             if full_image_dir in named_image_dirs:
                 named_image_dirs.remove(full_image_dir)
 
         # named_image_dirs should now only contain containers that are
         # not in the images
         if len(named_image_dirs) > 0:
-            self.start_txn(singularity_base)
             for image_dir in named_image_dirs:
                 target_path = os.path.realpath(image_dir)
-                #print("The target path of image is  %s" % target_path)
+                print("The target path of image is  %s" % target_path)
                 print("Removing deleted image: %s" % image_dir)
                 if not test:
                     try:
+                        self.start_txn(singularity_base)
                         os.unlink(image_dir)
                         shutil.rmtree(target_path)
+                        self.publish_txn(singularity_base)
                     except OSError as e:
                         print("Failed to remove deleted image: %s" % e)
-            self.publish_txn(singularity_base)
 
     def start_txn(self, hash_dir):
         global _in_txn
@@ -431,7 +429,7 @@ class ImageUnpacker:
         try:
             # Load images from remote
             self.images = self.load_images_from_remote(self.remote_url)
-            
+            print (self.images)     
             # Check Singularity availability
             try:
                 subprocess.run(['singularity', '--version'], 
@@ -457,7 +455,8 @@ class ImageUnpacker:
 
             # Remove images that are not in the list
             self.remove_unlisted_images(self.images, self.image_dir)
-
+       
+            
             # Report results
             if errors:
                 self.logger.error("Completed with {} errors:".format(len(errors)))
