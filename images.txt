@@ -3,5 +3,6 @@ gitlab-registry.nrp-nautilus.io/dweitzel/comfyui-on-nrp:latest
 # Derek's testing
 ghcr.io/djw8605/nrp-cvmfs-conda:latest
 
-# NRP test #1
-gitlab-registry.nrp-nautilus.io/nrp/amd-fpga-cvmfs/data-container:latest
+# 3dgrut libraries, datasets and envs, submitted by: @mfsada, on: 9/24/25
+docker.io/mfsada/3dgrut-environment:latest
+docker.io/mfsada/3dgrut-data:latest
