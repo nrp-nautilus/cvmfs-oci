@@ -5,7 +5,7 @@ ghcr.io/djw8605/nrp-cvmfs-conda:latest
 
 # 3dgrut libraries, datasets and envs, submitted by: @mfsada, on: 9/24/25
 docker.io/mfsada/3dgrut-environment:latest
-docker.io/mfsada/3dgrut-data:latest
+#docker.io/mfsada/3dgrut-data:latest
 
 # virtualenv w/ transformers, flash-attn, wandb, and rouge-score, submitted by: @varuniyer, on: 10/21/25
 quay.io/varuniyer/transformers-wandb-rouge:latest
